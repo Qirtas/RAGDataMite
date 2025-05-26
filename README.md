@@ -14,10 +14,10 @@ This project builds a basic pipeline that:
 ## Project Structure
 
 RAGForDatamite/
+├── RAG -> Main code folder
+├── Content/ files related to KB like raw csv files
 ├── KB/ # Preprocessing, ingestion, embeddings, vector store
 ├── Retrieval/ # Querying logic and evaluation
-├── RawContentFiles/ # Original content related CSV files
-├── ProcessedFiles/ # Cleaned CSV files
 ├── ProcessedDocuments/ # Pickled LangChain documents
 ├── main.py # Main pipeline for preprocessing, embedding & retrieval
 
@@ -26,23 +26,17 @@ Basic pipeline to test retrieval from existing documents:
 
 python main.py
 
-Edit main.py to:
-
-Preprocess raw files
-
-Run ingestion
-
-Generate embeddings
-
-Test query retrieval
-
-### Example Test Queries
+### Example Retrieval Queries
 Inside main.py, you can modify the list of test queries:
 
 test_queries = [
     "Explain the Financial Perspective in BSC",
     "What is Access Cost?"
 ]
+
+## Running Tests
+
+python -m unittest discover tests
 
 ## Next Steps
 
