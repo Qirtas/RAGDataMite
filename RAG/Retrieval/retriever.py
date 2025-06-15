@@ -1,6 +1,8 @@
 import os
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
+import logging
+logger = logging.getLogger(__name__)
 
 def setup_retriever(persist_directory="RAG/ProcessedDocuments/chroma_db",
                     model_name="all-MiniLM-L6-v2",
@@ -16,18 +18,18 @@ def setup_retriever(persist_directory="RAG/ProcessedDocuments/chroma_db",
         Returns:
             VectorStoreRetriever: A configured retriever object.
         """
-    print(f"Loading vector store from {persist_directory}")
+    logger.info(f"Loading vector store from {persist_directory}")
 
     embedding_function = HuggingFaceEmbeddings(model_name=model_name)
 
     vectorstore = Chroma(persist_directory=persist_directory,
                          embedding_function=embedding_function)
 
-    print(f"Vector store loaded with {vectorstore._collection.count()} documents")
+    logger.info(f"Vector store loaded with {vectorstore._collection.count()} documents")
 
     retriever = vectorstore.as_retriever(search_kwargs={"k": k})
 
-    print(f"Retriever initialized to fetch top {k} documents")
+    logger.info(f"Retriever initialized to fetch top {k} documents")
     return retriever
 
 
@@ -47,20 +49,20 @@ def test_retrieval(query, retriever=None, persist_directory="RAG/ProcessedDocume
     if retriever is None:
         retriever = setup_retriever(persist_directory=persist_directory, k=k)
 
-    print(f"\nQuery: {query}")
+    logger.info(f"\nQuery: {query}")
 
     docs = retriever.get_relevant_documents(query)
 
-    print(f"Retrieved {len(docs)} documents")
+    logger.info(f"Retrieved {len(docs)} documents")
 
     for i, doc in enumerate(docs):
-        print(f"\n--- Document {i + 1} ---")
-        print(f"Source: {doc.metadata.get('source', 'Unknown')}")
-        print(f"Type: {doc.metadata.get('type', 'Unknown')}")
-        print(f"Name: {doc.metadata.get('name', 'Unknown')}")
+        logger.info(f"\n--- Document {i + 1} ---")
+        logger.info(f"Source: {doc.metadata.get('source', 'Unknown')}")
+        logger.info(f"Type: {doc.metadata.get('type', 'Unknown')}")
+        logger.info(f"Name: {doc.metadata.get('name', 'Unknown')}")
 
         content_snippet = doc.page_content[:200] + "..." if len(doc.page_content) > 200 else doc.page_content
-        print(f"Content snippet: {content_snippet}")
+        logger.info(f"Content snippet: {content_snippet}")
 
     return docs
 

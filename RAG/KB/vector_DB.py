@@ -2,7 +2,8 @@ import os
 import pickle
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-
+import logging
+logger = logging.getLogger(__name__)
 
 def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddings.pkl",
                        persist_directory="RAG/ProcessedDocuments/chroma_db"):
@@ -17,7 +18,7 @@ def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddin
           Chroma: The Chroma vector store object.
       """
 
-    print(f"Loading document embeddings from {embeddings_file}")
+    logger.info(f"Loading document embeddings from {embeddings_file}")
 
     with open(embeddings_file, 'rb') as f:
         data = pickle.load(f)
@@ -25,12 +26,12 @@ def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddin
     documents = data["documents"]
     model_name = data["model_name"]
 
-    print(f"Loaded {len(documents)} documents with embeddings from model {model_name}")
+    logger.info(f"Loaded {len(documents)} documents with embeddings from model {model_name}")
 
-    print(f"Initializing embedding model: {model_name}")
+    logger.info(f"Initializing embedding model: {model_name}")
     embedding_function = HuggingFaceEmbeddings(model_name=model_name)
 
-    print(f"Creating Chroma vector store in {persist_directory}")
+    logger.info(f"Creating Chroma vector store in {persist_directory}")
     vectorstore = Chroma.from_documents(
         documents=documents,
         embedding=embedding_function,
@@ -40,7 +41,7 @@ def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddin
     # Persist the vector store
     # vectorstore.persist()
 
-    print(f"Vector store created and saved to {persist_directory}")
-    print(f"Total documents in vector store: {vectorstore._collection.count()}")
+    logger.info(f"Vector store created and saved to {persist_directory}")
+    logger.info(f"Total documents in vector store: {vectorstore._collection.count()}")
 
     return vectorstore

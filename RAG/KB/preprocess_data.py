@@ -5,8 +5,7 @@ from typing import List, Dict, Any, Optional
 import csv
 import json
 from typing import Dict, List
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import logging
 logger = logging.getLogger(__name__)
 
 CSV_FILES = {

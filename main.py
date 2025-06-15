@@ -13,6 +13,12 @@ from RAG.KB.vector_DB import create_vectorstore
 from RAG.KB.ingest_documents import ingest_documents
 from RAG.Retrieval.retriever import run_test_queries, test_retrieval
 
+logging.basicConfig(
+    level=logging.INFO,  # Can change to DEBUG when needed
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 if __name__ == '__main__':
 
     # 1. Preprocess CSV Files to clean for JSON related issues
@@ -23,25 +29,25 @@ if __name__ == '__main__':
     try:
         processed_files = preprocess_data(output_dir)
 
-        print("\nPreprocessing Summary:")
-        print("=====================")
+        logger.info("\nPreprocessing Summary:")
+        logger.info("=====================")
         for file_type, file_path in processed_files.items():
-            print(f"{file_type}: {file_path}")
+            logger.info(f"{file_type}: {file_path}")
 
-        print("\nTo use these files with KB.py:")
-        print("```python")
-        print("from KB import load_csv_as_documents, load_all_csvs_as_documents")
-        print("")
-        print("# Define processed file paths")
-        print("csv_files = {")
+        logger.info("\nTo use these files with KB.py:")
+        logger.info("```python")
+        logger.info("from KB import load_csv_as_documents, load_all_csvs_as_documents")
+        logger.info("")
+        logger.info("# Define processed file paths")
+        logger.info("csv_files = {")
         for file_type, file_path in processed_files.items():
-            print(f"    '{file_type}': '{file_path}',")
-        print("}")
-        print("")
-        print("# Load all documents")
-        print("all_docs = load_all_csvs_as_documents(csv_files)")
-        print("print(f\"Loaded {len(all_docs)} total documents\")")
-        print("```")
+            logger.info(f"    '{file_type}': '{file_path}',")
+        logger.info("}")
+        logger.info("")
+        logger.info("# Load all documents")
+        logger.info("all_docs = load_all_csvs_as_documents(csv_files)")
+        logger.info("print(f\"Loaded {len(all_docs)} total documents\")")
+        logger.info("```")
 
     except Exception as e:
         logger.error(f"Error preprocessing data: {str(e)}")
@@ -55,18 +61,17 @@ if __name__ == '__main__':
     documents = ingest_documents()
 
     if documents:
-        print("\nSample document:")
-        print("-" * 80)
+        logger.info("\nSample document:")
+        logger.info("-" * 80)
 
         sample_doc = next((doc for doc in documents if doc.metadata.get("type") == "KPI"), documents[0])
 
-        print("Content:")
-        print(sample_doc.page_content[:500] + "..." if len(sample_doc.page_content) > 500 else sample_doc.page_content)
-        print("-" * 80)
-        print("Metadata:")
-        print(sample_doc.metadata)
+        logger.info("Content:")
+        logger.info(sample_doc.page_content[:500] + "..." if len(sample_doc.page_content) > 500 else sample_doc.page_content)
+        logger.info("-" * 80)
+        logger.info("Metadata:")
+        logger.info(sample_doc.metadata)
     
-
 
     # 3. Analysing if there is a need for text chunking
 
@@ -80,11 +85,11 @@ if __name__ == '__main__':
         doc_lengths[doc_type].append(length)
 
     for doc_type, lengths in doc_lengths.items():
-        print(f"\n{doc_type} Documents:")
-        print(f"  Count: {len(lengths)}")
-        print(f"  Average length: {np.mean(lengths):.1f} characters")
-        print(f"  Min length: {min(lengths)} characters")
-        print(f"  Max length: {max(lengths)} characters")
+        logger.info(f"\n{doc_type} Documents:")
+        logger.info(f"  Count: {len(lengths)}")
+        logger.info(f"  Average length: {np.mean(lengths):.1f} characters")
+        logger.info(f"  Min length: {min(lengths)} characters")
+        logger.info(f"  Max length: {max(lengths)} characters")
 
         if lengths:
             longest_idx = np.argmax(lengths)
@@ -92,8 +97,8 @@ if __name__ == '__main__':
                                 if doc.metadata.get('type') == doc_type
                                 and i == longest_idx), None)
             if longest_doc:
-                print(f"  Longest document name: {longest_doc.metadata.get('name', 'Unknown')}")
-                print(f"  First 200 chars: {longest_doc.page_content[:200]}...")
+                logger.info(f"  Longest document name: {longest_doc.metadata.get('name', 'Unknown')}")
+                logger.info(f"  First 200 chars: {longest_doc.page_content[:200]}...")
 
 
 

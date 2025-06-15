@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import logging
 import json
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import logging
 logger = logging.getLogger(__name__)
 from langchain.docstore.document import Document
 from typing import List, Dict, Any, Optional
@@ -34,25 +34,25 @@ def ingest_documents(output_dir="RAG/ProcessedDocuments"):
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        print(f"Created output directory: {output_dir}")
+        logger.info(f"Created output directory: {output_dir}")
 
     all_documents = load_all_csvs_as_documents(csv_files)
-    print(f"Loaded {len(all_documents)} total documents")
+    logger.info(f"Loaded {len(all_documents)} total documents")
 
     doc_types = {}
     for doc in all_documents:
         doc_type = doc.metadata.get("type", "Unknown")
         doc_types[doc_type] = doc_types.get(doc_type, 0) + 1
 
-    print("\nDocuments by type:")
+    logger.info("\nDocuments by type:")
     for doc_type, count in doc_types.items():
-        print(f"- {doc_type}: {count} documents")
+        logger.info(f"- {doc_type}: {count} documents")
 
     output_path = os.path.join(output_dir, "all_documents.pkl")
     with open(output_path, 'wb') as f:
         pickle.dump(all_documents, f)
 
-    print(f"\nSaved {len(all_documents)} documents to {output_path}")
+    logger.info(f"\nSaved {len(all_documents)} documents to {output_path}")
 
     return all_documents
 
