@@ -6,6 +6,16 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddings.pkl",
                        persist_directory="RAG/ProcessedDocuments/chroma_db"):
+    """
+      Creates a Chroma vector store from document embeddings and persists it.
+
+      Args:
+          embeddings_file (str): Path to the pickle file containing documents and embeddings.
+          persist_directory (str): Directory where the Chroma DB will be saved.
+
+      Returns:
+          Chroma: The Chroma vector store object.
+      """
 
     print(f"Loading document embeddings from {embeddings_file}")
 

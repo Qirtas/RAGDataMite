@@ -5,6 +5,17 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 def setup_retriever(persist_directory="RAG/ProcessedDocuments/chroma_db",
                     model_name="all-MiniLM-L6-v2",
                     k=3):
+    """
+        Loads the Chroma vector store and initializes a retriever for querying.
+
+        Args:
+            persist_directory (str): Path to the Chroma DB directory.
+            model_name (str): Name of the HuggingFace embedding model.
+            k (int): Number of top documents to retrieve per query.
+
+        Returns:
+            VectorStoreRetriever: A configured retriever object.
+        """
     print(f"Loading vector store from {persist_directory}")
 
     embedding_function = HuggingFaceEmbeddings(model_name=model_name)
@@ -21,7 +32,18 @@ def setup_retriever(persist_directory="RAG/ProcessedDocuments/chroma_db",
 
 
 def test_retrieval(query, retriever=None, persist_directory="RAG/ProcessedDocuments/chroma_db", k=3):
+    """
+        Runs a query against the vector store retriever and prints basic info about retrieved documents.
 
+        Args:
+            query (str): The query text.
+            retriever (VectorStoreRetriever, optional): A retriever object to use. If None, creates one.
+            persist_directory (str): Path to the Chroma DB directory. Used if retriever is None.
+            k (int): Number of top documents to retrieve.
+
+        Returns:
+            list: List of retrieved Document objects.
+        """
     if retriever is None:
         retriever = setup_retriever(persist_directory=persist_directory, k=k)
 
@@ -44,7 +66,16 @@ def test_retrieval(query, retriever=None, persist_directory="RAG/ProcessedDocume
 
 
 def run_test_queries(queries, k=3):
+    """
+        Runs multiple queries through a shared retriever.
 
+        Args:
+            queries (list): A list of query strings.
+            k (int): Number of top documents to retrieve for each query.
+
+        Returns:
+            dict: A dictionary mapping each query string to its list of retrieved documents.
+        """
     retriever = setup_retriever(k=k)
 
     results = {}

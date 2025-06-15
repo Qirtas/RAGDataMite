@@ -19,6 +19,17 @@ CSV_FILES = {
 
 
 def preprocess_data(output_dir: str = "ProcessedFiles") -> Dict[str, str]:
+    """
+       Preprocesses raw CSV files by cleaning them and saving cleaned versions to the specified output directory.
+
+       Args:
+           output_dir (str): Path to the directory where cleaned CSV files will be saved.
+                            Defaults to "ProcessedFiles".
+
+       Returns:
+           Dict[str, str]: A dictionary mapping each CSV type (e.g. 'KPIs') to its cleaned file path.
+       """
+
 
     logger.info(f"Preprocessing data files to: {output_dir}")
 
