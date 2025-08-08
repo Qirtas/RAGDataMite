@@ -1,12 +1,15 @@
-import pickle
-import os
-import pandas as pd
-import logging
 import json
 import logging
+import os
+import pickle
+
+import pandas as pd
+
 logger = logging.getLogger(__name__)
+from typing import Any, Dict, List, Optional
+
 from langchain.docstore.document import Document
-from typing import List, Dict, Any, Optional
+
 
 def ingest_documents(output_dir="RAG/ProcessedDocuments"):
     """

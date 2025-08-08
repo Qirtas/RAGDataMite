@@ -1,8 +1,11 @@
-import unittest
 import os
 import shutil
+import unittest
+
 from langchain_community.vectorstores.chroma import Chroma
+
 from RAG.KB.vector_DB import create_vectorstore
+
 
 class TestVectorDB(unittest.TestCase):
     def setUp(self):

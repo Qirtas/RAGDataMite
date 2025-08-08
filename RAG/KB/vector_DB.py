@@ -1,8 +1,12 @@
+import logging
 import os
 import pickle
+
+import chromadb
+from chromadb.config import Settings
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-import logging
+
 logger = logging.getLogger(__name__)
 
 def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddings.pkl",
@@ -31,17 +35,26 @@ def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddin
     logger.info(f"Initializing embedding model: {model_name}")
     embedding_function = HuggingFaceEmbeddings(model_name=model_name)
 
+    client_settings = Settings(anonymized_telemetry=False, allow_reset=True)
+    chroma_client = chromadb.Client(settings=client_settings)
+
     logger.info(f"Creating Chroma vector store in {persist_directory}")
     vectorstore = Chroma.from_documents(
         documents=documents,
-        embedding=embedding_function,
-        persist_directory=persist_directory
+        embedding=HuggingFaceEmbeddings(model_name=model_name),
+        persist_directory="RAG/ProcessedDocuments/chroma_db",
+        client_settings=Settings(
+            is_persistent=True,
+            persist_directory="RAG/ProcessedDocuments/chroma_db",
+            anonymized_telemetry=False,
+        ),
+        collection_metadata={"hnsw:space": "cosine"}
     )
 
-    # Persist the vector store
     # vectorstore.persist()
 
     logger.info(f"Vector store created and saved to {persist_directory}")
     logger.info(f"Total documents in vector store: {vectorstore._collection.count()}")
+    logger.info(f"vector store metadata: {vectorstore._collection.metadata}")
 
     return vectorstore

@@ -1,6 +1,8 @@
-import unittest
 import os
+import unittest
+
 from RAG.KB.generating_embeddings import generate_embeddings
+
 
 class TestGenerateEmbeddings(unittest.TestCase):
     def test_generate_embeddings_output_structure(self):

@@ -1,11 +1,10 @@
-import os
-import sys
-import logging
-from typing import List, Dict, Any, Optional
 import csv
 import json
-from typing import Dict, List
 import logging
+import os
+import sys
+from typing import Any, Dict, List, Optional
+
 logger = logging.getLogger(__name__)
 
 CSV_FILES = {

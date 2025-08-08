@@ -1,6 +1,9 @@
 import unittest
+
 from langchain.docstore.document import Document
+
 from RAG.KB.ingest_documents import ingest_documents
+
 
 class TestIngestDocuments(unittest.TestCase):
     def test_ingestion_returns_documents(self):

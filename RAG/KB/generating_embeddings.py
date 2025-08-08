@@ -1,6 +1,8 @@
 import os
 import pickle
+
 from langchain_huggingface import HuggingFaceEmbeddings
+
 
 def generate_embeddings(model_name="all-MiniLM-L6-v2", input_file="RAG/ProcessedDocuments/all_documents.pkl",
                       output_file="RAG/ProcessedDocuments/document_embeddings.pkl"):
