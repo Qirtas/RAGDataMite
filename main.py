@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
 
-    '''
+
     # 1. Preprocess CSV Files to clean for JSON related issues
 
     output_dir = "RAG/Content/ProcessedFiles"
@@ -132,7 +132,6 @@ if __name__ == '__main__':
     # 5. Creating vector DB and save embeddings to Vector DB
 
     vectorstore = create_vectorstore()
-    '''
 
 
     # 6. Testing Retrieval
@@ -156,7 +155,7 @@ if __name__ == '__main__':
     #
     # Testing retrieval with both k and similarity_threshold
 
-    '''
+
     test_queries = [
         "What is Access Cost?",
         "Define CAPES",
@@ -183,7 +182,7 @@ if __name__ == '__main__':
                       f"(Score: {result['similarity_score']:.3f})")
         else:
             print("No results found with threshold 0.44")
-    '''
+
 
     # 7. Ask Claude with Context along with validation step
 
