@@ -41,6 +41,52 @@ test_queries = [
     "What is Access Cost?"
 ]
 
+## Backend API (FastAPI)
+added an api.py file for exposing our RAG as a simple fast api.
+To use this first set up environment variables:
+export ANTHROPIC_API_KEY=
+export PERSIST_DIR=RAG/ProcessedDocuments/chroma_db
+
+Then for one time, build the vector DB:
+python main.py --mode index --persist_dir RAG/ProcessedDocuments/chroma_db
+
+Then start API server locally:
+uvicorn RAG.api:app --host 0.0.0.0 --port 8000
+
+### Endpoints
+
+#### Ask a question
+
+POST /ask
+Content-Type: application/json
+
+##### Request
+{
+  "question": "What is Access Cost?",
+  "k": 2,
+  "min_similarity": 0.28
+}
+
+##### Response
+{
+  "answer": "…LLM answer…",
+  "sources": [
+    {
+      "name": "Access Cost", 
+      "snippet": "KPI Name: Access Cost…",
+      "metadata": { "type": "KPI", "source": "RAG/Content/ProcessedFiles/clean_KPIs.csv" }
+    }
+  ],
+  "meta": { "k": 2, "min_similarity": 0.28 }
+}
+
+### Testing
+
+curl -X POST "http://127.0.0.1:8000/ask" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "What is Access Cost?", "k": 3, "min_similarity": 0.28}'
+
+
 ## Running Tests
 
 python -m unittest discover tests

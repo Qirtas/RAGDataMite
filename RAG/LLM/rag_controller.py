@@ -4,7 +4,7 @@ from RAG.Retrieval.retriever import get_retrieval_results
 
 
 def rag_with_validation(query, min_similarity=0.40,
-                                 persist_directory="RAG/ProcessedDocuments/chroma_db", k=3):
+                                 persist_directory="RAG/ProcessedDocuments/chroma_db", k=3, retriever=None):
     """
     RAG system with semantic validation step
     """

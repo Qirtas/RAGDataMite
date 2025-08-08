@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
 
-
+    '''
     # 1. Preprocess CSV Files to clean for JSON related issues
 
     output_dir = "RAG/Content/ProcessedFiles"
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # 5. Creating vector DB and save embeddings to Vector DB
 
     vectorstore = create_vectorstore()
-
+    '''
 
     # 6. Testing Retrieval
 
@@ -155,7 +155,7 @@ if __name__ == '__main__':
     #
     # Testing retrieval with both k and similarity_threshold
 
-
+    '''
     test_queries = [
         "What is Access Cost?",
         "Define CAPES",
@@ -182,11 +182,11 @@ if __name__ == '__main__':
                       f"(Score: {result['similarity_score']:.3f})")
         else:
             print("No results found with threshold 0.44")
-
+    '''
 
     # 7. Ask Claude with Context along with validation step
 
-    # result1 = rag_with_validation("How do we measure data quality?", min_similarity=0.40)
+    # result1 = rag_with_validation("How do we measure data quality?", min_similarity=0.20)
     # print(f"Answer: {result1['answer']}")
     # print(f"Number of sources: {len(result1['sources'])}")
     # print()
@@ -400,6 +400,7 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
+    '''
     # 2. Calculating similarity scores for top-1 hit for test sets to see similarity distributions
 
     # 1) Initialize retriever (top-1)
@@ -445,6 +446,7 @@ if __name__ == '__main__':
 
     df_grid.to_csv("RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_in_dom_relation.csv", index=False)
     print(df_grid.sort_values(["f1"], ascending=False).head(10))
+    '''
 
     # Plotting
 
