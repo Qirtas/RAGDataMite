@@ -189,10 +189,10 @@ if __name__ == '__main__':
 
     # 7. Ask Claude with Context along with validation step
 
-    # result1 = rag_with_validation("What is CAPEX?", min_similarity=0.20)
-    # print(f"Answer: {result1['answer']}")
-    # print(f"Number of sources: {len(result1['sources'])}")
-    # print()
+    result1 = rag_with_validation("What is CAPEX?", min_similarity=0.20)
+    print(f"Answer: {result1['answer']}")
+    print(f"Number of sources: {len(result1['sources'])}")
+    print()
 
 # -----------------------------------------------------------------------------
 

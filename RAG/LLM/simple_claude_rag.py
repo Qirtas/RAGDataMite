@@ -17,7 +17,6 @@ def ask_claude_with_docs(question, docs):
     # client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     client = anthropic.Anthropic(api_key="")
 
-
     prompt = f"""Answer this question based on the provided context:
 
 Context:
