@@ -13,11 +13,11 @@ def rag_with_validation(query, min_similarity=0.40,
     print(f"{'=' * 80}")
 
     # Step 1: Initial retrieval from KB and quality control
-    results = get_retrieval_results(query, persist_directory=persist_directory, k=k)
+    results = get_retrieval_results(query, retriever, persist_directory=persist_directory, k=k)
 
     if not results or results[0][1] < min_similarity:
         best_similarity = results[0][1] if results else 0
-        print(f"Best similarity ({best_similarity:.4f}) below threshold ({min_similarity})")
+        print(f"Best similarityyy ({best_similarity:.4f}) below threshold ({min_similarity})")
         return {
             "answer": "I don't have relevant information to answer this question.",
             "sources": [],

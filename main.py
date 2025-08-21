@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from langchain.docstore.document import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
 
+from RAG.Evaluation.evaluate_adaptive_retrieval import run_evaluation
 from RAG.Evaluation.retriever_evaluation import (collect_scores,
                                                  load_questions,
                                                  summarize_and_plot)
@@ -27,11 +30,11 @@ from RAG.Evaluation.test_set_out_of_domain import (convert_to_custom_format,
 from RAG.Evaluation.tuning_params import (evaluate_grid, load_test_set,
                                           plot_precision_recall)
 from RAG.KB.generating_embeddings import generate_embeddings
-from RAG.KB.ingest_documents import ingest_documents
+from RAG.KB.ingest_documents import (ingest_documents,
+                                     load_all_csvs_as_documents)
 from RAG.KB.preprocess_data import preprocess_data
 from RAG.KB.vector_DB import create_vectorstore
 from RAG.LLM.rag_controller import rag_with_validation
-
 from RAG.Retrieval.retriever import (get_retrieval_results,
                                      get_retrieval_with_threshold,
                                      setup_retriever)
@@ -79,7 +82,7 @@ if __name__ == '__main__':
         logger.error(f"Error preprocessing data: {str(e)}")
         sys.exit(1)
 
-
+    
     # 2. Documents Ingestion - converting to Langchain documents
 
     documents = ingest_documents()
@@ -186,18 +189,16 @@ if __name__ == '__main__':
 
     # 7. Ask Claude with Context along with validation step
 
-    # result1 = rag_with_validation("How do we measure data quality?", min_similarity=0.20)
+    # result1 = rag_with_validation("What is CAPEX?", min_similarity=0.20)
     # print(f"Answer: {result1['answer']}")
     # print(f"Number of sources: {len(result1['sources'])}")
     # print()
-
 
 # -----------------------------------------------------------------------------
 
     # *****************************************
     # RAG EVALUATION
     # *****************************************
-
 
     # Step 1: Generate test set with 5 different question types
 
@@ -461,3 +462,7 @@ if __name__ == '__main__':
     # plot_precision_recall(df_direct, "Precision-Recall (Direct Domain)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_direct_domain.png")
     # plot_precision_recall(df_typos, "Precision-Recall (Domain w/ Typos)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_indomain_typo.png")
     # plot_precision_recall(df_oos, "Precision-Recall (Out of Domain)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_outOf_domain.png")
+
+
+
+# ----------------------------------------------------------------------------------------------------------------

@@ -45,6 +45,7 @@ test_queries = [
 added an api.py file for exposing our RAG as a simple fast api.
 To use this first set up environment variables:
 export ANTHROPIC_API_KEY=
+
 export PERSIST_DIR=RAG/ProcessedDocuments/chroma_db
 
 Then for one time, build the vector DB:

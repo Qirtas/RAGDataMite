@@ -1,12 +1,13 @@
 import os
 from typing import Any, Dict, List, Tuple
-from langchain.docstore.document import Document
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from langchain.docstore.document import Document
 from pydantic import BaseModel
 
-from RAG.Retrieval.retriever import setup_retriever
 from RAG.LLM.rag_controller import rag_with_validation
+from RAG.Retrieval.retriever import setup_retriever
 
 app = FastAPI(title="Datamite RAG API", version="0.1.0")
 
@@ -65,16 +66,13 @@ def _startup():
     global retriever
 
     persist_dir = os.getenv("PERSIST_DIR", "RAG/ProcessedDocuments/chroma_db")
-    k_default = 2
+    k_default = 3
 
-    # Load the retriever (read-only, thread-safe in practice)
     try:
         retriever = setup_retriever(persist_directory=persist_dir, k=k_default)
     except Exception as e:
-        # Don’t crash the server; fail requests with clear errors instead
         print(f"[startup] Failed to setup retriever from {persist_dir}: {e}")
 
-    # Warn early if key is missing (helpful for new devs)
     if not os.getenv("ANTHROPIC_API_KEY"):
         print("[startup] WARNING: ANTHROPIC_API_KEY is not set. /ask will fail when calling the LLM.")
 
