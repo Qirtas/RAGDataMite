@@ -14,8 +14,8 @@ def ask_claude_with_docs(question, docs):
     ])
 
     # Step 2: Query Claude
-    # client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-    client = anthropic.Anthropic(api_key="")
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    # client = anthropic.Anthropic(api_key="")
 
     prompt = f"""Answer this question based on the provided context:
 

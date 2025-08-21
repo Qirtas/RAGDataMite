@@ -1,3 +1,4 @@
+import argparse
 import json
 import logging
 import os
@@ -37,15 +38,6 @@ from RAG.LLM.rag_controller import rag_with_validation
 from RAG.Retrieval.retriever import (get_retrieval_results,
                                      get_retrieval_with_threshold,
                                      setup_retriever)
-
-os.environ[
-    "ANTHROPIC_API_KEY"] = ""
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
 
@@ -188,10 +180,10 @@ if __name__ == '__main__':
 
     # 7. Ask Claude with Context along with validation step
 
-    result1 = rag_with_validation("What is CAPEX?", min_similarity=0.20)
-    print(f"Answer: {result1['answer']}")
-    print(f"Number of sources: {len(result1['sources'])}")
-    print()
+    # result1 = rag_with_validation("What is CAPEX?", min_similarity=0.20)
+    # print(f"Answer: {result1['answer']}")
+    # print(f"Number of sources: {len(result1['sources'])}")
+    # print()
 
 # -----------------------------------------------------------------------------
 
