@@ -13,7 +13,6 @@ from langchain.docstore.document import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
-from RAG.Evaluation.evaluate_adaptive_retrieval import run_evaluation
 from RAG.Evaluation.retriever_evaluation import (collect_scores,
                                                  load_questions,
                                                  summarize_and_plot)
