@@ -39,7 +39,52 @@ from RAG.Retrieval.retriever import (get_retrieval_results,
                                      get_retrieval_with_threshold,
                                      setup_retriever)
 
+def run_index(persist_dir: str):
+    """
+    Full indexing pipeline: preprocess -> ingest -> embeddings -> vector DB.
+    Idempotent: safe to re-run when CSVs change.
+    """
+    # 1) Preprocess CSVs
+    output_dir = "RAG/Content/ProcessedFiles"
+    processed_files = preprocess_data(output_dir)
+
+    # 2) Ingest to LangChain Documents (+ writes all_documents.pkl)
+    documents = ingest_documents()
+
+    # 3) Generate embeddings
+    generate_embeddings()
+
+    # 4) Create/update Chroma vector DB
+    _ = create_vectorstore()
+    logging.info(f"Index build complete. Vector DB at: {persist_dir}")
+
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description="RAGForDatamite pipeline runner"
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["index", "demo", "eval", "all"],
+        default="demo",
+        help=(
+            "index = build vector DB (preprocess -> ingest -> embed -> vectorstore); "
+        ),
+    )
+    parser.add_argument(
+        "--persist_dir",
+        default="RAG/ProcessedDocuments/chroma_db",
+        help="Directory for Chroma vector DB."
+    )
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+    if args.mode in ("index", "all"):
+        run_index(args.persist_dir)
+
+    logging.info("Done.")
 
     '''
     # 1. Preprocess CSV Files to clean for JSON related issues
