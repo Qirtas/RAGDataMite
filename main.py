@@ -42,7 +42,6 @@ from RAG.Retrieval.retriever import (get_retrieval_results,
 def run_index(persist_dir: str):
     """
     Full indexing pipeline: preprocess -> ingest -> embeddings -> vector DB.
-    Idempotent: safe to re-run when CSVs change.
     """
     # 1) Preprocess CSVs
     output_dir = "RAG/Content/ProcessedFiles"
