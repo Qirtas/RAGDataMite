@@ -6,8 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from langchain.docstore.document import Document
 from pydantic import BaseModel
 
-from RAG.LLM.rag_controller import rag_with_validation
-from RAG.Retrieval.retriever import setup_retriever
+from RAGDataMite.RAG.LLM.rag_controller import rag_with_validation
+from RAGDataMite.RAG.Retrieval.retriever import setup_retriever
 
 app = FastAPI(title="Datamite RAG API", version="0.1.0")
 
