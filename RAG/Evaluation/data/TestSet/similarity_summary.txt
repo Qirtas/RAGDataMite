@@ -1,0 +1,8 @@
+=== Similarity Score Summary by Category ===
+                                    distance                                         sim_scaled                                         cosine_similarity                                        
+                                       count       min    median      mean       max      count       min    median      mean       max             count       min    median      mean       max
+category                                                                                                                                                                                         
+direct_domain_relevant                   985  0.152232  0.442604  0.456716  0.767482        985  0.565777  0.693191  0.690289  0.867880               985  0.232518  0.557396  0.543284  0.847768
+direct_domain_relevant_relationship      978  0.318368  0.491414  0.497756  0.751668        978  0.570885  0.670505  0.669489  0.758513               978  0.248332  0.508586  0.502244  0.681632
+domain_relevant_with_typos               985  0.160487  0.602403  0.602424  0.892029        985  0.528533  0.624063  0.627282  0.861707               985  0.107971  0.397597  0.397576  0.839513
+out_of_domain                            950  0.419146  0.866951  0.859410  0.993688        950  0.501583  0.535633  0.538429  0.704649               950  0.006312  0.133049  0.140590  0.580854

@@ -1,9 +1,22 @@
 import os
 import pickle
+
 from langchain_huggingface import HuggingFaceEmbeddings
+
 
 def generate_embeddings(model_name="all-MiniLM-L6-v2", input_file="RAG/ProcessedDocuments/all_documents.pkl",
                       output_file="RAG/ProcessedDocuments/document_embeddings.pkl"):
+    """
+        Generates embeddings for LangChain Documents using HuggingFace model and saves to a pickle file.
+
+        Args:
+            model_name (str): Name of the HuggingFace embedding model.
+            input_file (str): Path to input pickle containing LangChain Documents.
+            output_file (str): Path to save the output embeddings pickle.
+
+        Returns:
+            dict: Dictionary containing documents, embeddings, and model name.
+        """
 
     print(f"Loading documents from {input_file}")
 

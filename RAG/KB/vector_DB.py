@@ -1,13 +1,28 @@
+import logging
 import os
 import pickle
+
+import chromadb
+from chromadb.config import Settings
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 
+logger = logging.getLogger(__name__)
 
 def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddings.pkl",
                        persist_directory="RAG/ProcessedDocuments/chroma_db"):
+    """
+      Creates a Chroma vector store from document embeddings and persists it.
 
-    print(f"Loading document embeddings from {embeddings_file}")
+      Args:
+          embeddings_file (str): Path to the pickle file containing documents and embeddings.
+          persist_directory (str): Directory where the Chroma DB will be saved.
+
+      Returns:
+          Chroma: The Chroma vector store object.
+      """
+
+    logger.info(f"Loading document embeddings from {embeddings_file}")
 
     with open(embeddings_file, 'rb') as f:
         data = pickle.load(f)
@@ -15,22 +30,31 @@ def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddin
     documents = data["documents"]
     model_name = data["model_name"]
 
-    print(f"Loaded {len(documents)} documents with embeddings from model {model_name}")
+    logger.info(f"Loaded {len(documents)} documents with embeddings from model {model_name}")
 
-    print(f"Initializing embedding model: {model_name}")
+    logger.info(f"Initializing embedding model: {model_name}")
     embedding_function = HuggingFaceEmbeddings(model_name=model_name)
 
-    print(f"Creating Chroma vector store in {persist_directory}")
+    client_settings = Settings(anonymized_telemetry=False, allow_reset=True)
+    chroma_client = chromadb.Client(settings=client_settings)
+
+    logger.info(f"Creating Chroma vector store in {persist_directory}")
     vectorstore = Chroma.from_documents(
         documents=documents,
-        embedding=embedding_function,
-        persist_directory=persist_directory
+        embedding=HuggingFaceEmbeddings(model_name=model_name),
+        persist_directory="RAG/ProcessedDocuments/chroma_db",
+        client_settings=Settings(
+            is_persistent=True,
+            persist_directory="RAG/ProcessedDocuments/chroma_db",
+            anonymized_telemetry=False,
+        ),
+        collection_metadata={"hnsw:space": "cosine"}
     )
 
-    # Persist the vector store
     # vectorstore.persist()
 
-    print(f"Vector store created and saved to {persist_directory}")
-    print(f"Total documents in vector store: {vectorstore._collection.count()}")
+    logger.info(f"Vector store created and saved to {persist_directory}")
+    logger.info(f"Total documents in vector store: {vectorstore._collection.count()}")
+    logger.info(f"vector store metadata: {vectorstore._collection.metadata}")
 
     return vectorstore

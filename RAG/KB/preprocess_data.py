@@ -1,12 +1,10 @@
-import os
-import sys
-import logging
-from typing import List, Dict, Any, Optional
 import csv
 import json
-from typing import Dict, List
+import logging
+import os
+import sys
+from typing import Any, Dict, List, Optional
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 CSV_FILES = {
@@ -19,6 +17,17 @@ CSV_FILES = {
 
 
 def preprocess_data(output_dir: str = "ProcessedFiles") -> Dict[str, str]:
+    """
+       Preprocesses raw CSV files by cleaning them and saving cleaned versions to the specified output directory.
+
+       Args:
+           output_dir (str): Path to the directory where cleaned CSV files will be saved.
+                            Defaults to "ProcessedFiles".
+
+       Returns:
+           Dict[str, str]: A dictionary mapping each CSV type (e.g. 'KPIs') to its cleaned file path.
+       """
+
 
     logger.info(f"Preprocessing data files to: {output_dir}")
 

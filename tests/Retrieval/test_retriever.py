@@ -1,6 +1,10 @@
 import unittest
+
 from langchain.vectorstores.base import VectorStoreRetriever
-from RAG.Retrieval.retriever import setup_retriever, test_retrieval, run_test_queries
+
+from RAG.Retrieval.retriever import (run_test_queries, setup_retriever,
+                                     test_retrieval)
+
 
 class TestRetriever(unittest.TestCase):
     def test_setup_retriever_returns_valid_object(self):

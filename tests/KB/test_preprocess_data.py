@@ -1,7 +1,9 @@
-import unittest
 import os
 import shutil
+import unittest
+
 from RAG.KB.preprocess_data import preprocess_data
+
 
 class TestPreprocessData(unittest.TestCase):
     def setUp(self):
