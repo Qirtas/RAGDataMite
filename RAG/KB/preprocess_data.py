@@ -8,11 +8,11 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 CSV_FILES = {
-    'KPIs': 'RAG/Content/RawContentFiles/KPIs.csv',
-    'Objectives': 'RAG/Content/RawContentFiles/Objectives.csv',
-    'BSC_families': 'RAG/Content/RawContentFiles/BSC_families.csv',
-    'BSC_subfamilies': 'RAG/Content/RawContentFiles/BSC_subfamilies.csv',
-    'Criteria': 'RAG/Content/RawContentFiles/Criteria.csv'
+    'KPIs': 'RAGDataMite/RAG/Content/RawContentFiles/KPIs.csv',
+    'Objectives': 'RAGDataMite/RAG/Content/RawContentFiles/Objectives.csv',
+    'BSC_families': 'RAGDataMite/RAG/Content/RawContentFiles/BSC_families.csv',
+    'BSC_subfamilies': 'RAGDataMite/RAG/Content/RawContentFiles/BSC_subfamilies.csv',
+    'Criteria': 'RAGDataMite/RAG/Content/RawContentFiles/Criteria.csv'
 }
 
 

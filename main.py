@@ -14,10 +14,10 @@ from langchain.docstore.document import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
-from RAG.Evaluation.retriever_evaluation import (collect_scores,
+from RAGDataMite.RAG.Evaluation.retriever_evaluation import (collect_scores,
                                                  load_questions,
                                                  summarize_and_plot)
-from RAG.Evaluation.test_set_creation import (create_entity_name_typo,
+from RAGDataMite.RAG.Evaluation.test_set_creation import (create_entity_name_typo,
                                               create_question_word_typo,
                                               generate_bsc_family_questions,
                                               generate_bsc_subfamily_questions,
@@ -25,17 +25,17 @@ from RAG.Evaluation.test_set_creation import (create_entity_name_typo,
                                               generate_kpi_questions,
                                               generate_objective_questions,
                                               generate_relationship_questions)
-from RAG.Evaluation.test_set_out_of_domain import (convert_to_custom_format,
+from RAGDataMite.RAG.Evaluation.test_set_out_of_domain import (convert_to_custom_format,
                                                    fetch_trivia_questions)
-from RAG.Evaluation.tuning_params import (evaluate_grid, load_test_set,
+from RAGDataMite.RAG.Evaluation.tuning_params import (evaluate_grid, load_test_set,
                                           plot_precision_recall)
-from RAG.KB.generating_embeddings import generate_embeddings
-from RAG.KB.ingest_documents import (ingest_documents,
+from RAGDataMite.RAG.KB.generating_embeddings import generate_embeddings
+from RAGDataMite.RAG.KB.ingest_documents import (ingest_documents,
                                      load_all_csvs_as_documents)
-from RAG.KB.preprocess_data import preprocess_data
-from RAG.KB.vector_DB import create_vectorstore
-from RAG.LLM.rag_controller import rag_with_validation
-from RAG.Retrieval.retriever import (get_retrieval_results,
+from RAGDataMite.RAG.KB.preprocess_data import preprocess_data
+from RAGDataMite.RAG.KB.vector_DB import create_vectorstore
+from RAGDataMite.RAG.LLM.rag_controller import rag_with_validation
+from RAGDataMite.RAG.Retrieval.retriever import (get_retrieval_results,
                                      get_retrieval_with_threshold,
                                      setup_retriever)
 
@@ -44,7 +44,7 @@ def run_index(persist_dir: str):
     Full indexing pipeline: preprocess -> ingest -> embeddings -> vector DB.
     """
     # 1) Preprocess CSVs
-    output_dir = "RAG/Content/ProcessedFiles"
+    output_dir = "RAGDataMite/RAG/Content/ProcessedFiles"
     processed_files = preprocess_data(output_dir)
 
     # 2) Ingest to LangChain Documents (+ writes all_documents.pkl)
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "--persist_dir",
-        default="RAG/ProcessedDocuments/chroma_db",
+        default="RAGDataMite/RAG/ProcessedDocuments/chroma_db",
         help="Directory for Chroma vector DB."
     )
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     '''
     # 1. Preprocess CSV Files to clean for JSON related issues
 
-    output_dir = "RAG/Content/ProcessedFiles"
+    output_dir = "RAGDataMite/RAG/Content/ProcessedFiles"
 
     try:
         processed_files = preprocess_data(output_dir)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     # 3. Analysing if there is a need for text chunking
 
-    with open('RAG/ProcessedDocuments/all_documents.pkl', 'rb') as f:
+    with open('RAGDataMite/RAG/ProcessedDocuments/all_documents.pkl', 'rb') as f:
         documents = pickle.load(f)
 
     doc_lengths = defaultdict(list)
@@ -241,11 +241,11 @@ if __name__ == '__main__':
     # 1. Direct Domain Relevant Questions
 
     csv_files = {
-        'KPIs': 'RAG/Evaluation/data/clean_KPIs.csv',
-        'Objectives': 'RAG/Evaluation/data/clean_Objectives.csv',
-        'BSC_families': 'RAG/Evaluation/data/clean_BSC_families.csv',
-        'BSC_subfamilies': 'RAG/Evaluation/data/clean_BSC_subfamilies.csv',
-        'Criteria': 'RAG/Evaluation/data/clean_Criteria.csv'
+        'KPIs': 'RAGDataMite/RAG/Evaluation/data/clean_KPIs.csv',
+        'Objectives': 'RAGDataMite/RAG/Evaluation/data/clean_Objectives.csv',
+        'BSC_families': 'RAGDataMite/RAG/Evaluation/data/clean_BSC_families.csv',
+        'BSC_subfamilies': 'RAGDataMite/RAG/Evaluation/data/clean_BSC_subfamilies.csv',
+        'Criteria': 'RAGDataMite/RAG/Evaluation/data/clean_Criteria.csv'
     }
 
     '''
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         ]
 
     # Save to JSON file
-    output_file = 'RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json'
+    output_file = 'RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(all_questions, f, indent=2, ensure_ascii=False)
 
@@ -327,7 +327,7 @@ if __name__ == '__main__':
     # Generating typo variations of direct domain questions.
 
     # Load the direct domain questions
-    input_file = 'RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json'
+    input_file = 'RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json'
 
     with open(input_file, 'r', encoding='utf-8') as f:
         direct_questions = json.load(f)
@@ -358,7 +358,7 @@ if __name__ == '__main__':
             f"{q['expected_document_type']}::{q['entity_name']}"
         ]
 
-    output_file = 'RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json'
+    output_file = 'RAGDataMite/RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(typo_questions, f, indent=2, ensure_ascii=False)
 
@@ -372,7 +372,7 @@ if __name__ == '__main__':
     print("Fetching trivia questions from Open Trivia Database...")
 
     trivia_questions = fetch_trivia_questions(num_questions=950)
-    convert_to_custom_format(trivia_questions, "RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
+    convert_to_custom_format(trivia_questions, "RAGDataMite/RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
 
     print("Created simple out-of-domain questions for testing")
     print("\nTo get 500+ questions from Open Trivia DB, uncomment the API calls in the main section")
@@ -427,7 +427,7 @@ if __name__ == '__main__':
         q['question_id'] = idx
 
     # Save to JSON file
-    output_file = 'RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json'
+    output_file = 'RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(all_questions, f, indent=2, ensure_ascii=False)
 
@@ -443,15 +443,15 @@ if __name__ == '__main__':
 
     k=1
     retriever = setup_retriever(
-        persist_directory="RAG/ProcessedDocuments/chroma_db",
+        persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db",
         k=k
     )
 
     # 2) Load test sets
-    direct_qs = load_questions("RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json")
-    out_qs = load_questions("RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
-    domain_typo_qs = load_questions("RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json")
-    domain_relation_qs = load_questions("RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json")
+    direct_qs = load_questions("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json")
+    out_qs = load_questions("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
+    domain_typo_qs = load_questions("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json")
+    domain_relation_qs = load_questions("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json")
 
     # 3) Collect scores
     df_direct = collect_scores(direct_qs, retriever, k)
@@ -465,38 +465,38 @@ if __name__ == '__main__':
 
     # 3. Running gird search to find optimal k and threshold
 
-    direct_ques_testset = load_test_set("RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json")
-    out_dom_ques_testset = load_test_set("RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
-    in_dom_typos_ques_testset = load_test_set("RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json")
-    in_dom_relation_ques_testset = load_test_set("RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json")
+    direct_ques_testset = load_test_set("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_questions.json")
+    out_dom_ques_testset = load_test_set("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_out_of_domain_trivia.json")
+    in_dom_typos_ques_testset = load_test_set("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_domain_typo_questions.json")
+    in_dom_relation_ques_testset = load_test_set("RAGDataMite/RAG/Evaluation/data/TestSet/test_set_direct_domain_relationship_questions.json")
 
     ks = [1, 2, 3, 4, 5, 7, 10]
     thresholds = [0.1, 0.2, 0.25, 0.3, 0.35, 0.5, 0.7, 0.9]
 
     df_grid = evaluate_grid(
         test_questions=in_dom_relation_ques_testset,
-        persist_directory="RAG/ProcessedDocuments/chroma_db",
+        persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db",
         ks=ks,
         thresholds=thresholds
     )
 
-    df_grid.to_csv("RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_in_dom_relation.csv", index=False)
+    df_grid.to_csv("RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_in_dom_relation.csv", index=False)
     print(df_grid.sort_values(["f1"], ascending=False).head(10))
     '''
 
     # Plotting
 
-    # path_direct = "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_direct_domain.csv"
-    # path_typos = "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_indomain_typo.csv"
-    # path_oos = "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_outOf_domain.csv"
+    # path_direct = "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_direct_domain.csv"
+    # path_typos = "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_indomain_typo.csv"
+    # path_oos = "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_outOf_domain.csv"
     #
     # df_direct = pd.read_csv(path_direct)
     # df_typos = pd.read_csv(path_typos)
     # df_oos = pd.read_csv(path_oos)
     #
-    # plot_precision_recall(df_direct, "Precision-Recall (Direct Domain)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_direct_domain.png")
-    # plot_precision_recall(df_typos, "Precision-Recall (Domain w/ Typos)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_indomain_typo.png")
-    # plot_precision_recall(df_oos, "Precision-Recall (Out of Domain)", "RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_outOf_domain.png")
+    # plot_precision_recall(df_direct, "Precision-Recall (Direct Domain)", "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_direct_domain.png")
+    # plot_precision_recall(df_typos, "Precision-Recall (Domain w/ Typos)", "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_indomain_typo.png")
+    # plot_precision_recall(df_oos, "Precision-Recall (Out of Domain)", "RAGDataMite/RAG/Evaluation/data/TestSet/GridSearchResults/grid_search_outOf_domain.png")
 
 
 

@@ -3,7 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from RAG.Retrieval.retriever import setup_retriever
+from RAGDataMite.RAG.Retrieval.retriever import setup_retriever
 
 
 def load_questions(path: str) -> list:

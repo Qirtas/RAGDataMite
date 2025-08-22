@@ -1,10 +1,10 @@
-from RAG.LLM.simple_claude_rag import ask_claude_with_docs
-from RAG.LLM.validation_search import validation_search
-from RAG.Retrieval.retriever import get_retrieval_results
+from RAGDataMite.RAG.LLM.simple_claude_rag import ask_claude_with_docs
+from RAGDataMite.RAG.LLM.validation_search import validation_search
+from RAGDataMite.RAG.Retrieval.retriever import get_retrieval_results
 
 
 def rag_with_validation(query, min_similarity=0.40,
-                                 persist_directory="RAG/ProcessedDocuments/chroma_db", k=3, retriever=None):
+                                 persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db", k=3, retriever=None):
     """
     RAG system with semantic validation step
     """

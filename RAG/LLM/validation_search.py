@@ -5,7 +5,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from RAG.Retrieval.retriever import get_retrieval_results
+from RAGDataMite.RAG.Retrieval.retriever import get_retrieval_results
 
 
 class ValidationSearch:
