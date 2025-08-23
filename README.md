@@ -9,7 +9,7 @@ This project builds a basic pipeline that:
 - Converts them into LangChain-compatible `Document` objects
 - Generates vector embeddings for LangChain docs
 - Stores those embeddings in a vector DB
-- Can retrieve documents based on users questions
+- Can retrieve documents based on users question
 - Can provide LLM (Claude) generated answers for users questions
 - Performed optimisation for selecting k (number of documents to retrieve and similarity thresholds)
 
