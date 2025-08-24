@@ -44,16 +44,22 @@ We provide ready-made scripts for **macOS** (`.sh`) and **Windows PowerShell** (
 
 ---
 
-### 2. Create environment
+### 2. Create Environment
 
-#### Create conda env with Python 3.10
+To set up the environment, follow these steps:
+
+```bash
+# Create conda env with Python 3.10
 conda create -n datamite_env python=3.10
 
-#### Activate it
+# Activate it
 conda activate datamite_env
 
-#### Install dependencies
+# Install dependencies
 pip install -r requirements.txt
+```
+
+---
 
 ### 3. Environment variables
 
@@ -61,19 +67,24 @@ You need to export API keys depending on which LLM provider you want to use.
 
 Claude (Anthropic):
 
-macOS
+```bash
+# macOS
 export ANTHROPIC_API_KEY=""
 
-Windows
+# Windows
 $env:ANTHROPIC_API_KEY = ""
+```
 
 DeepSeek (via OpenRouter):
 
-macOS
+```bash
+# macOS
 export OPENROUTER_API_KEY=""
 
-Windows
+# Windows
 $env:OPENROUTER_API_KEY = ""
+```
+---
 
 ### 4. Scripts
 
@@ -81,37 +92,50 @@ We provide helper scripts for both platforms.
 
 macOS
 
-Run with Claude:
+```bash
+# Run with Claude:
 
 ./run_claude.sh "What is CAPEX?"
 
-Run with DeepSeek:
+# Run with DeepSeek:
 
 ./run_deepseek.sh "What is CAPEX?"
+```
 
 Windows
 
-Run with Claude:
+```bash
+# Run with Claude:
 
 .\run_claude.ps1 "What is CAPEX?"
 
-Run with DeepSeek:
+# Run with DeepSeek:
 
 .\run_deepseek.ps1 "What is CAPEX?"
-
+```
+---
 
 ### Backend API (FastAPI)
 added an api.py file for exposing our RAG as a simple fast api.
 To use this first set up environment variables:
+
+```bash
 export ANTHROPIC_API_KEY=
 
 export PERSIST_DIR=RAG/ProcessedDocuments/chroma_db
+```
 
 Then for one time, build the vector DB:
+
+```bash
 python main.py --mode index --persist_dir RAG/ProcessedDocuments/chroma_db
+```
 
 Then start API server locally:
+
+```bash
 uvicorn RAG.api:app --host 0.0.0.0 --port 8000
+```
 
 #### Endpoints
 
@@ -139,6 +163,8 @@ Content-Type: application/json
   ],
   "meta": { "k": 2, "min_similarity": 0.28 }
 }
+
+---
 
 ## Running Tests
 
