@@ -1,13 +1,15 @@
+# RAG/api.py
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from langchain.docstore.document import Document
 from pydantic import BaseModel
 
-from RAGDataMite.RAG.LLM.rag_controller import rag_with_validation
-from RAGDataMite.RAG.Retrieval.retriever import setup_retriever
+from RAG.LLM.rag_controller import rag_with_validation
+from RAG.Retrieval.retriever import setup_retriever
+from RAG.LLM.llm_provider import build_llm_from_env  # <-- NEW
 
 app = FastAPI(title="Datamite RAG API", version="0.1.0")
 
@@ -29,15 +31,6 @@ class AskResponse(BaseModel):
     meta: Dict[str, Any] = {}
 
 def _to_source_item(s: Any) -> Dict[str, Any]:
-    """
-    Normalize a source into a simple dict for the UI.
-
-    Supports:
-      - LangChain Document
-      - (Document, score) tuples
-      - dicts with possible nested document
-    """
-
     if isinstance(s, Document):
         name = s.metadata.get("name") or s.metadata.get("id") or s.metadata.get("type")
         return {
@@ -46,7 +39,6 @@ def _to_source_item(s: Any) -> Dict[str, Any]:
             "snippet": (s.page_content or "")[:300],
             "metadata": s.metadata
         }
-
     return {
         "name": None,
         "url": None,
@@ -60,39 +52,43 @@ retriever = None
 @app.on_event("startup")
 def _startup():
     """
-    Load the retriever ONCE when the server boots.
-    This avoids reloading the vector store on every request.
+    Load the retriever and build the chosen LLM ONCE when the server boots.
     """
     global retriever
-
     persist_dir = os.getenv("PERSIST_DIR", "RAG/ProcessedDocuments/chroma_db")
     k_default = 3
 
     try:
         retriever = setup_retriever(persist_directory=persist_dir, k=k_default)
+        print(f"[startup] Retriever ready (persist_dir={persist_dir})")
     except Exception as e:
         print(f"[startup] Failed to setup retriever from {persist_dir}: {e}")
 
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        print("[startup] WARNING: ANTHROPIC_API_KEY is not set. /ask will fail when calling the LLM.")
-
+    # Build & inject the LLM implementation (DeepSeek or Claude)
+    try:
+        app.state.llm = build_llm_from_env()
+        print(f"[startup] LLM provider ready: {os.getenv('LLM_PROVIDER', 'deepseek')}")
+    except Exception as e:
+        print(f"[startup] LLM setup failed: {e}")
 
 @app.post("/ask", response_model=AskResponse)
 def ask(req: AskRequest):
     if not req.question or not req.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
-
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY is not set on the server.")
+    if not hasattr(app.state, "llm"):
+        raise HTTPException(status_code=500, detail="LLM provider is not configured.")
 
     try:
-        result = rag_with_validation(req.question, min_similarity=req.min_similarity, retriever=retriever)
-
+        result = rag_with_validation(
+            req.question,
+            min_similarity=req.min_similarity,
+            persist_directory=os.getenv("PERSIST_DIR", "RAG/ProcessedDocuments/chroma_db"),
+            k=req.k,
+            retriever=retriever,
+            llm=app.state.llm,  # <-- INJECTED
+        )
         raw_sources = result.get("sources", []) or []
-
-        # Converting to a UI friendly schema
         sources = [_to_source_item(s) for s in raw_sources]
-
         return {
             "answer": result.get("answer", ""),
             "sources": sources,

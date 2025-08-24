@@ -7,7 +7,7 @@ from langchain_community.vectorstores import Chroma
 
 logger = logging.getLogger(__name__)
 
-def setup_retriever(persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db",
+def setup_retriever(persist_directory="RAG/ProcessedDocuments/chroma_db",
                     model_name="all-MiniLM-L6-v2",
                     k=3):
     """
@@ -36,7 +36,7 @@ def setup_retriever(persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma
     return retriever
 
 
-def get_retrieval_results(query, retriever=None, persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db", k=3):
+def get_retrieval_results(query, retriever=None, persist_directory="RAG/ProcessedDocuments/chroma_db", k=3):
     """
     Runs a query against the vector store KB and prints similarity scores.
 
@@ -93,7 +93,7 @@ def get_retrieval_with_threshold(
         query: str,
         k: int,
         similarity_threshold: float,
-        persist_directory: str = "RAGDataMite/RAG/ProcessedDocuments/chroma_db",
+        persist_directory: str = "RAG/ProcessedDocuments/chroma_db",
         model_name: str = "all-MiniLM-L6-v2"
 ) -> List[Dict[str, Any]]:
     """

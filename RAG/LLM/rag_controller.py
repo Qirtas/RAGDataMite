@@ -1,10 +1,12 @@
-from RAGDataMite.RAG.LLM.simple_claude_rag import ask_claude_with_docs
-from RAGDataMite.RAG.LLM.validation_search import validation_search
-from RAGDataMite.RAG.Retrieval.retriever import get_retrieval_results
+from typing import Any, Dict, List, Optional
+from RAG.LLM.validation_search import validation_search
+from RAG.LLM.llm_provider import LLMClient
+from RAG.Retrieval.retriever import get_retrieval_results
 
 
 def rag_with_validation(query, min_similarity=0.40,
-                                 persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db", k=3, retriever=None):
+                                 persist_directory="RAG/ProcessedDocuments/chroma_db", k=3, retriever=None,
+                        llm: Optional[LLMClient] = None) -> Dict[str, Any]:
     """
     RAG system with semantic validation step
     """
@@ -25,26 +27,28 @@ def rag_with_validation(query, min_similarity=0.40,
             "validation": None
         }
 
-    # Step 2: Filter documents and generate answer using claude
+    # Step 2: Filter documents and generate answer using injected LLM
     filtered_docs = [result[0] for result in results if result[1] >= min_similarity]
     print(f"Found {len(filtered_docs)} documents above similarity threshold ({min_similarity})")
 
-    # Sending Query + retrieved docs to LLM
-    claude_result = ask_claude_with_docs(query, filtered_docs)
-    print(f"Claude Result Before Validation Search: {claude_result}")
+    if llm is None:
+        raise RuntimeError("LLM client not provided to rag_with_validation")
+
+    llm_result = llm.ask_with_docs(query, filtered_docs)
+    print(f"[RAG] LLM Result Before Validation Search: {llm_result['answer'][:120]}...")
 
     # Step 3: Perform validation search
     validation_result = validation_search(
         original_question=query,
-        llm_answer=claude_result["answer"],
+        llm_answer=llm_result["answer"],
         original_docs=filtered_docs,
         persist_directory=persist_directory
     )
 
     # Step 4: Combine results
     final_result = {
-        "answer": claude_result["answer"],
-        "sources": claude_result["sources"],
+        "answer": llm_result["answer"],
+        "sources": llm_result["sources"],
         "quality_check": "passed",
         "validation": validation_result,
         "confidence": validation_result["confidence"],

@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 from langchain.docstore.document import Document
 
 
-def ingest_documents(output_dir="RAGDataMite/RAG/ProcessedDocuments"):
+def ingest_documents(output_dir="RAG/ProcessedDocuments"):
     """
        Loads cleaned CSVs, converts them to LangChain Document objects, and saves as a pickle file.
 
@@ -23,11 +23,11 @@ def ingest_documents(output_dir="RAGDataMite/RAG/ProcessedDocuments"):
        """
 
     csv_files = {
-        'KPIs': 'RAGDataMite/RAG/Content/ProcessedFiles/clean_KPIs.csv',
-        'Objectives': 'RAGDataMite/RAG/Content/ProcessedFiles/clean_Objectives.csv',
-        'BSC_families': 'RAGDataMite/RAG/Content/ProcessedFiles/clean_BSC_families.csv',
-        'BSC_subfamilies': 'RAGDataMite/RAG/Content/ProcessedFiles/clean_BSC_subfamilies.csv',
-        'Criteria': 'RAGDataMite/RAG/Content/ProcessedFiles/clean_Criteria.csv'
+        'KPIs': 'RAG/Content/ProcessedFiles/clean_KPIs.csv',
+        'Objectives': 'RAG/Content/ProcessedFiles/clean_Objectives.csv',
+        'BSC_families': 'RAG/Content/ProcessedFiles/clean_BSC_families.csv',
+        'BSC_subfamilies': 'RAG/Content/ProcessedFiles/clean_BSC_subfamilies.csv',
+        'Criteria': 'RAG/Content/ProcessedFiles/clean_Criteria.csv'
     }
 
     # missing_files = [path for path in csv_files.values() if not os.path.exists(path)]

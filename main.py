@@ -14,10 +14,10 @@ from langchain.docstore.document import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 
-from RAGDataMite.RAG.Evaluation.retriever_evaluation import (collect_scores,
+from RAG.Evaluation.retriever_evaluation import (collect_scores,
                                                  load_questions,
                                                  summarize_and_plot)
-from RAGDataMite.RAG.Evaluation.test_set_creation import (create_entity_name_typo,
+from RAG.Evaluation.test_set_creation import (create_entity_name_typo,
                                               create_question_word_typo,
                                               generate_bsc_family_questions,
                                               generate_bsc_subfamily_questions,
@@ -25,17 +25,17 @@ from RAGDataMite.RAG.Evaluation.test_set_creation import (create_entity_name_typ
                                               generate_kpi_questions,
                                               generate_objective_questions,
                                               generate_relationship_questions)
-from RAGDataMite.RAG.Evaluation.test_set_out_of_domain import (convert_to_custom_format,
+from RAG.Evaluation.test_set_out_of_domain import (convert_to_custom_format,
                                                    fetch_trivia_questions)
-from RAGDataMite.RAG.Evaluation.tuning_params import (evaluate_grid, load_test_set,
+from RAG.Evaluation.tuning_params import (evaluate_grid, load_test_set,
                                           plot_precision_recall)
-from RAGDataMite.RAG.KB.generating_embeddings import generate_embeddings
-from RAGDataMite.RAG.KB.ingest_documents import (ingest_documents,
+from RAG.KB.generating_embeddings import generate_embeddings
+from RAG.KB.ingest_documents import (ingest_documents,
                                      load_all_csvs_as_documents)
-from RAGDataMite.RAG.KB.preprocess_data import preprocess_data
-from RAGDataMite.RAG.KB.vector_DB import create_vectorstore
-from RAGDataMite.RAG.LLM.rag_controller import rag_with_validation
-from RAGDataMite.RAG.Retrieval.retriever import (get_retrieval_results,
+from RAG.KB.preprocess_data import preprocess_data
+from RAG.KB.vector_DB import create_vectorstore
+from RAG.LLM.rag_controller import rag_with_validation
+from RAG.Retrieval.retriever import (get_retrieval_results,
                                      get_retrieval_with_threshold,
                                      setup_retriever)
 
@@ -44,7 +44,7 @@ def run_index(persist_dir: str):
     Full indexing pipeline: preprocess -> ingest -> embeddings -> vector DB.
     """
     # 1) Preprocess CSVs
-    output_dir = "RAGDataMite/RAG/Content/ProcessedFiles"
+    output_dir = "RAG/Content/ProcessedFiles"
     processed_files = preprocess_data(output_dir)
 
     # 2) Ingest to LangChain Documents (+ writes all_documents.pkl)
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "--persist_dir",
-        default="RAGDataMite/RAG/ProcessedDocuments/chroma_db",
+        default="RAG/ProcessedDocuments/chroma_db",
         help="Directory for Chroma vector DB."
     )
 

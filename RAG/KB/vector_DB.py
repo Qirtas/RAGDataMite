@@ -9,8 +9,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 logger = logging.getLogger(__name__)
 
-def create_vectorstore(embeddings_file="RAGDataMite/RAG/ProcessedDocuments/document_embeddings.pkl",
-                       persist_directory="RAGDataMite/RAG/ProcessedDocuments/chroma_db"):
+def create_vectorstore(embeddings_file="RAG/ProcessedDocuments/document_embeddings.pkl",
+                       persist_directory="RAG/ProcessedDocuments/chroma_db"):
     """
       Creates a Chroma vector store from document embeddings and persists it.
 
