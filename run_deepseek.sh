@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Setting Configs
 export LLM_PROVIDER=deepseek
-export OPENROUTER_API_KEY=
+#export OPENROUTER_API_KEY=
 export OPENAI_BASE_URL="${OPENAI_BASE_URL:-https://openrouter.ai/api/v1}"
 export OR_MODEL_SLUG="${OR_MODEL_SLUG:-deepseek/deepseek-chat-v3-0324:free}"
 export PERSIST_DIR="${PERSIST_DIR:-RAG/ProcessedDocuments/chroma_db}"
