@@ -27,21 +27,80 @@ RAGForDatamite/
 ├── main.py # Main pipeline for preprocessing, embedding & retrieval
 
 ## How to Run
-Basic pipeline to test retrieval from existing documents:
 
-python main.py
+This project supports running the RAG API with **two different LLM providers**:
+- [Anthropic Claude](https://www.anthropic.com/)  
+- [DeepSeek (via OpenRouter)](https://openrouter.ai/)  
 
-All components of RAG system have been called from main.py where I have added brief comment with each piece. You may uncomment relevant part and use it.
+You can switch between LLMs without changing any code by setting the `LLM_PROVIDER` environment variable (`claude` or `deepseek`).  
+We provide ready-made scripts for **macOS** (`.sh`) and **Windows PowerShell** (`.ps1`).
 
-### Example Retrieval Queries
-Inside main.py, you can modify the list of test queries:
+---
 
-test_queries = [
-    "Explain the Financial Perspective in BSC",
-    "What is Access Cost?"
-]
+### 1. Prerequisites
 
-## Backend API (FastAPI)
+- **Python**: version **3.10** is required.  
+- **Conda** (recommended for environment management).  
+
+---
+
+### 2. Create environment
+
+#### Create conda env with Python 3.10
+conda create -n datamite_env python=3.10
+
+#### Activate it
+conda activate datamite_env
+
+#### Install dependencies
+pip install -r requirements.txt
+
+### 3. Environment variables
+
+You need to export API keys depending on which LLM provider you want to use.
+
+Claude (Anthropic):
+
+macOS
+export ANTHROPIC_API_KEY=""
+
+Windows
+$env:ANTHROPIC_API_KEY = ""
+
+DeepSeek (via OpenRouter):
+
+macOS
+export OPENROUTER_API_KEY=""
+
+Windows
+$env:OPENROUTER_API_KEY = ""
+
+### 4. Scripts
+
+We provide helper scripts for both platforms.
+
+macOS
+
+Run with Claude:
+
+./run_claude.sh "What is CAPEX?"
+
+Run with DeepSeek:
+
+./run_deepseek.sh "What is CAPEX?"
+
+Windows
+
+Run with Claude:
+
+.\run_claude.ps1 "What is CAPEX?"
+
+Run with DeepSeek:
+
+.\run_deepseek.ps1 "What is CAPEX?"
+
+
+### Backend API (FastAPI)
 added an api.py file for exposing our RAG as a simple fast api.
 To use this first set up environment variables:
 export ANTHROPIC_API_KEY=
@@ -54,21 +113,21 @@ python main.py --mode index --persist_dir RAG/ProcessedDocuments/chroma_db
 Then start API server locally:
 uvicorn RAG.api:app --host 0.0.0.0 --port 8000
 
-### Endpoints
+#### Endpoints
 
-#### Ask a question
+##### Ask a question
 
 POST /ask
 Content-Type: application/json
 
-##### Request
+###### Request
 {
   "question": "What is Access Cost?",
   "k": 2,
   "min_similarity": 0.28
 }
 
-##### Response
+###### Response
 {
   "answer": "…LLM answer…",
   "sources": [
@@ -80,13 +139,6 @@ Content-Type: application/json
   ],
   "meta": { "k": 2, "min_similarity": 0.28 }
 }
-
-### Testing
-
-curl -X POST "http://127.0.0.1:8000/ask" \
-     -H "Content-Type: application/json" \
-     -d '{"question": "What is Access Cost?", "k": 3, "min_similarity": 0.28}'
-
 
 ## Running Tests
 
