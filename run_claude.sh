@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Setting Configs
 export LLM_PROVIDER=claude
-#export ANTHROPIC_API_KEY=
+export ANTHROPIC_API_KEY=
 export PERSIST_DIR="${PERSIST_DIR:-RAG/ProcessedDocuments/chroma_db}"
 PORT="${PORT:-8000}"
 QUESTION="${1:-What is CAPEX?}"
