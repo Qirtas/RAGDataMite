@@ -3,8 +3,9 @@ __pycache__/
 *.pyc
 .idea/
 .vscode/
-RAG/ProcessedDocuments/*.pkl
-RAG/ProcessedDocuments/chroma_db/
+RAG/ProcessedDocuments/
+*.sqlite3
+*.pkl
 *.sqlite3
 *.log
 tests/test_output_embeddings.pkl
