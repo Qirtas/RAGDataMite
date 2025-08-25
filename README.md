@@ -61,7 +61,21 @@ pip install -r requirements.txt
 
 ---
 
-### 3. Environment variables
+### 3. Generate API keys
+
+###  Claude (Anthropic)
+1. Sign in to the [Anthropic Console](https://console.anthropic.com/).
+2. Navigate to **Settings** → **API Keys**
+3. Click **Create Key**, give it a name (e.g., “datamite_test”), and copy the generated key. **Save it safely**.
+
+###  DeepSeek (via OpenRouter)
+1. Go to [OpenRouter’s website](https://openrouter.ai/) and **sign up or log in**.
+2. Open the menu (top-right), go to **Settings** → **API Keys**, and click **Create Key**.
+3. Name the key and then copy it and store it safely—this key grants API access to DeepSeek models via OpenRouter.
+
+---
+
+### 4. Environment variables
 
 You need to export API keys depending on which LLM provider you want to use.
 
@@ -86,7 +100,7 @@ $env:OPENROUTER_API_KEY = ""
 ```
 ---
 
-### 4. Scripts
+### 5. Scripts
 
 We provide helper scripts for both platforms.
 
