@@ -2,15 +2,6 @@
 """
 Cross-platform CLI for RAGForDatamite dev tasks.
 
-Usage examples:
-  # 1) Build index only
-  python cli.py index --persist-dir RAG/ProcessedDocuments/chroma_db
-
-  # 2) Run API (Ctrl+C to stop)
-  python cli.py run-api --port 8000
-
-  # 3) One-shot test: build index -> start API -> POST /ask -> stop
-  python cli.py ask --question "What is CAPEX?" --k 3 --min-similarity 0.28 --port 8000
 """
 
 import json
@@ -31,26 +22,32 @@ try:
 except Exception:
     pass
 
-app = typer.Typer(help="Dev commands for RAG RAGForDatamite (cross-platform).")
+app = typer.Typer(help="Dev commands for RAGForDatamite (cross-platform).")
 
 # ---- helpers -----------------------------------------------------------------
 
 def _echo(msg: str):
     typer.echo(msg)
 
-def _check_env(llm_provider: str):
-    # Extend this if you add more providers later
-    if llm_provider.lower() == "claude":
-        if not os.environ.get("ANTHROPIC_API_KEY"):
-            raise typer.Exit(
-                _exit_with_error(
-                    "ANTHROPIC_API_KEY is not set. Export it (or put it in a .env) and re-run."
-                )
-            )
-
 def _exit_with_error(msg: str, code: int = 1):
     _echo(typer.style(msg, fg=typer.colors.RED, bold=True))
     return code
+
+def _check_env(llm_provider: str):
+    p = (llm_provider or "").lower()
+    if p == "claude":
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            raise typer.Exit(
+                _exit_with_error("ANTHROPIC_API_KEY is not set. Export it (or put it in a .env) and re-run.")
+            )
+    elif p == "deepseek":
+        # Using OpenRouter for DeepSeek
+        if not os.environ.get("OPENROUTER_API_KEY"):
+            raise typer.Exit(
+                _exit_with_error("OPENROUTER_API_KEY is not set. Export it (or put it in a .env) and re-run.")
+            )
+    else:
+        raise typer.Exit(_exit_with_error(f"Unknown --llm-provider '{llm_provider}'. Use 'claude' or 'deepseek'."))
 
 def _env(**extra):
     env = os.environ.copy()
@@ -84,7 +81,6 @@ def _start_uvicorn(app_path: str, host: str, port: int, reload: bool, log_file: 
     stdout = subprocess.PIPE
     stderr = subprocess.STDOUT
     if log_file:
-        # Write to a file (append mode)
         f = open(log_file, "a", buffering=1, encoding="utf-8")
         proc = subprocess.Popen(args, stdout=f, stderr=f, env=os.environ.copy())
         return proc, f
@@ -101,7 +97,6 @@ def _stop_process(proc: subprocess.Popen, log_handle=None):
             except subprocess.TimeoutExpired:
                 proc.kill()
         else:
-            # Try graceful
             proc.send_signal(signal.SIGINT)
             try:
                 proc.wait(timeout=5)
@@ -121,9 +116,7 @@ def _stop_process(proc: subprocess.Popen, log_handle=None):
 def index(
     persist_dir: str = typer.Option("RAG/ProcessedDocuments/chroma_db", "--persist-dir", help="Chroma/VectorDB path"),
 ):
-    """
-    Build vector DB (calls: python main.py --mode index --persist_dir ...).
-    """
+    """Build vector DB (calls: python main.py --mode index --persist_dir ...)."""
     _echo(f"Building vector DB at: {persist_dir}")
     cmd = [sys.executable, "main.py", "--mode", "index", "--persist_dir", persist_dir]
     try:
@@ -138,14 +131,11 @@ def run_api(
     app_path: str = typer.Option("RAG.api:app", "--app"),
     reload: bool = typer.Option(True, "--reload/--no-reload"),
 ):
-    """
-    Start FastAPI via uvicorn. Press Ctrl+C to stop.
-    """
+    """Start FastAPI via uvicorn. Press Ctrl+C to stop."""
     _echo(f"Starting API: {app_path} at http://{host}:{port} (reload={reload})")
     proc, log_handle = _start_uvicorn(app_path, host, port, reload, log_file=None)
     try:
         # foreground attach: print uvicorn output
-        # stream until Ctrl+C
         while True:
             line = proc.stdout.readline()
             if not line:
@@ -170,28 +160,33 @@ def ask(
     port: int = typer.Option(8000, "--port", "-p"),
     host: str = typer.Option("127.0.0.1", "--host"),
     persist_dir: str = typer.Option("RAG/ProcessedDocuments/chroma_db", "--persist-dir"),
-    llm_provider: str = typer.Option("claude", "--llm-provider"),
+    llm_provider: str = typer.Option("claude", "--llm-provider", help="claude | deepseek"),
     app_path: str = typer.Option("RAG.api:app", "--app"),
     reload: bool = typer.Option(False, "--reload/--no-reload"),
-    log_file: str = typer.Option(".server_claude.log", "--log-file"),
-    build_index: bool = typer.Option(True, "--index/--no-index", help="Build vector DB before starting API"),
+    log_file: str = typer.Option(".server.log", "--log-file"),
+    build_index: bool = typer.Option(False, "--index/--no-index", help="(Default: no) Build index before starting API"),
+    reset_index: bool = typer.Option(False, "--reset-index/--no-reset-index", help="Delete persist_dir before indexing"),
 ):
     """
-    Full one-shot test: (optional) index -> start server -> POST /ask -> stop.
-    Mirrors your bash script, but cross-platform.
+    One-shot test: (optional) index -> start server -> POST /ask -> stop.
     """
-    # Set env needed by your app
-    os.environ.setdefault("LLM_PROVIDER", llm_provider)
-    os.environ.setdefault("PERSIST_DIR", persist_dir)
+    import shutil
 
-    _echo(f"Using LLM_PROVIDER={os.environ.get('LLM_PROVIDER')}")
-    _echo(f"PERSIST_DIR={os.environ.get('PERSIST_DIR')}")
-
-    # Provider-specific checks
+    # Pre-flight keys/deps
     _check_env(llm_provider)
 
-    # 1) build vector DB (optional)
+    # Env for API subprocess
+    os.environ["LLM_PROVIDER"] = llm_provider.lower()
+    os.environ.setdefault("PERSIST_DIR", persist_dir)
+    _echo(f"LLM_PROVIDER={os.environ['LLM_PROVIDER']}")
+    _echo(f"PERSIST_DIR={os.environ['PERSIST_DIR']}")
+
+    # 1) (optional) index once
     if build_index:
+        if reset_index and os.path.exists(persist_dir):
+            _echo(f"--reset-index: removing {persist_dir}")
+            shutil.rmtree(persist_dir, ignore_errors=True)
+
         _echo("Building vector DB...")
         cmd = [sys.executable, "main.py", "--mode", "index", "--persist_dir", persist_dir]
         try:
@@ -199,11 +194,11 @@ def ask(
         except subprocess.CalledProcessError as e:
             raise typer.Exit(_exit_with_error(f"Indexing failed (exit {e.returncode})."))
 
-    # 2) start API (background)
+    # 2) start API
     _echo(f"Starting Uvicorn on port {port} ...")
     proc, handle = _start_uvicorn(app_path, host="0.0.0.0", port=port, reload=reload, log_file=log_file)
 
-    # 3) wait until it's ready
+    # 3) wait until ready
     ok = _wait_for_api("127.0.0.1", port, timeout=25.0)
     if not ok:
         _stop_process(proc, handle)
@@ -212,18 +207,17 @@ def ask(
     # 4) send request
     url = f"http://127.0.0.1:{port}/ask"
     payload = {"question": question, "k": k, "min_similarity": min_similarity}
-    _echo(f"Sending test request to {url}")
+    _echo(f"POST {url}")
     try:
         r = requests.post(url, json=payload, timeout=120)
         try:
-            parsed = r.json()
-            _echo(json.dumps(parsed, indent=2)[:20000])  # print up to 20k chars
+            print(json.dumps(r.json(), indent=2)[:20000])
         except Exception:
-            _echo(f"HTTP {r.status_code}\n{r.text[:20000]}")
+            print(f"HTTP {r.status_code}\n{r.text[:20000]}")
     except Exception as e:
         _echo(f"Request failed: {e}")
 
-    # 5) stop server
+    # 5) stop
     _echo(f"Stopping server (PID {proc.pid})")
     _stop_process(proc, handle)
 
