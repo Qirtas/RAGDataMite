@@ -172,12 +172,15 @@ def ask(
     """
     import shutil
 
-    # Pre-flight keys/deps
-    _check_env(llm_provider)
+    effective_provider = (os.environ.get("LLM_PROVIDER") or llm_provider or "claude").lower()
 
-    # Env for API subprocess
-    os.environ["LLM_PROVIDER"] = llm_provider.lower()
+    # Pre-flight checks for the chosen provider
+    _check_env(effective_provider)
+
+    # Make sure the API subprocess sees the effective value
+    os.environ["LLM_PROVIDER"] = effective_provider
     os.environ.setdefault("PERSIST_DIR", persist_dir)
+
     _echo(f"LLM_PROVIDER={os.environ['LLM_PROVIDER']}")
     _echo(f"PERSIST_DIR={os.environ['PERSIST_DIR']}")
 
