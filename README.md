@@ -83,50 +83,36 @@ Claude (Anthropic):
 
 ```bash
 # macOS
-export ANTHROPIC_API_KEY=""
+export LLM_PROVIDER=claude
+export ANTHROPIC_API_KEY=KEY
 
 # Windows
-$env:ANTHROPIC_API_KEY = ""
+$env:LLM_PROVIDER = "claude"
+$env:ANTHROPIC_API_KEY = "KEY" 
 ```
 
 DeepSeek (via OpenRouter):
 
 ```bash
 # macOS
-export OPENROUTER_API_KEY=""
+export LLM_PROVIDER=deepseek
+export OPENROUTER_API_KEY=KEY
 
 # Windows
-$env:OPENROUTER_API_KEY = ""
+$env:LLM_PROVIDER = "deepseek"
+$env:OPENROUTER_API_KEY = "KEY" 
 ```
 ---
 
-### 5. Scripts
+### 5. Run with CLI
 
-We provide helper scripts for both platforms.
-
-macOS
+Build the index, start the server, send a query, and stop the server, all in one step.
 
 ```bash
-# Run with Claude:
-
-./run_claude.sh "What is CAPEX?"
-
-# Run with DeepSeek:
-
-./run_deepseek.sh "What is CAPEX?"
+python cli.py ask --index --reset-index --question "What is CAPEX?" --port 8000
 ```
-
-Windows
+Subsequent tests (do NOT index again):
 
 ```bash
-# Run with Claude:
-
-.\run_claude.ps1 "What is CAPEX?"
-
-# Run with DeepSeek:
-
-.\run_deepseek.ps1 "What is CAPEX?"
+python cli.py ask --question "What is CAPEX?" --port 8000 --no-index
 ```
----
-
-
