@@ -59,6 +59,7 @@ def run_index(persist_dir: str):
 
 if __name__ == '__main__':
 
+    print("Interpreter:", sys.executable)
     parser = argparse.ArgumentParser(
         description="RAGForDatamite pipeline runner"
     )
@@ -78,6 +79,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    logger = logging.getLogger("datamite")
+    logger.setLevel(logging.INFO)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     if args.mode in ("index", "all"):
