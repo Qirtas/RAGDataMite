@@ -105,7 +105,7 @@ def validation_search(original_question, llm_answer, original_docs,
     Validation search using semantic similarity
     """
     print(f"\n{'=' * 60}")
-    print("🔍 PERFORMING VALIDATION SEARCH")
+    print("PERFORMING VALIDATION SEARCH")
     print(f"{'=' * 60}")
 
     validator = ValidationSearch()
