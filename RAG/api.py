@@ -1,5 +1,6 @@
 # RAG/api.py
 import os
+import re
 from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException
@@ -95,4 +96,5 @@ def ask(req: AskRequest):
             "meta": {"k": req.k, "min_similarity": req.min_similarity}
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"RAG failed: {e}")
+        safe = re.sub(r'[^\x00-\x7F]+', '?', str(e))
+        raise HTTPException(status_code=500, detail=f"RAG failed: {safe}")
