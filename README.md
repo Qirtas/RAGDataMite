@@ -10,101 +10,119 @@ This project builds a basic pipeline that:
 - Generates vector embeddings for LangChain docs
 - Stores those embeddings in a vector DB
 - Can retrieve documents based on users question
-- Can provide LLM (Claude) generated answers for users questions
-- Performed optimisation for selecting k (number of documents to retrieve and similarity thresholds)
+- Can provide LLM (Claude or Deepseek) generated answers for users questions
 
-
-## Project Structure
-
-RAGForDatamite/
-├── RAG -> Main code folder
-├── Content/ files related to KB like raw csv files
-├── Evaluation/ test sets, tuning for k and similarity thresholds
-├── KB/ # Preprocessing, ingestion, embeddings, vector store
-├── LLM/ # Claude API integration, generating answers with LLM
-├── Retrieval/ # Querying logic and evaluation
-├── ProcessedDocuments/ # Pickled LangChain documents
-├── main.py # Main pipeline for preprocessing, embedding & retrieval
+In this prototype, we also expose the pipeline through a FastAPI service. This allows us to run the API locally, ask questions via the CLI or endpoint and receive answers directly from the chosen LLM along with the supporting source documents.  
 
 ## How to Run
 
-This project supports running the RAG API with **two different LLM providers**:
+This project supports running the RAG Fast API with **two different LLM providers**:
 - [Anthropic Claude](https://www.anthropic.com/)  
 - [DeepSeek (via OpenRouter)](https://openrouter.ai/)  
 
-You can switch between LLMs without changing any code by setting the `LLM_PROVIDER` environment variable (`claude` or `deepseek`).  
-We provide ready-made scripts for **macOS** (`.sh`) and **Windows PowerShell** (`.ps1`).
+You can switch between them without changing code by setting one environment variable.
 
 ---
 
-### 1. Prerequisites
+## What you’ll do
+
+	1.	Get the code
+	2.	Create a Python environment
+	3.	Install the required packages
+	4.	Set your LLM provider and API key
+	5.	Run a one-shot test by sending API request
+	6.	Ask more questions (without rebuilding)
+
+
+
+### Prerequisites
 
 - **Python**: version **3.10** is required.  
-- **Conda** (recommended for environment management).  
+- **Conda** (For environment management).  
 
 ---
+### 1. Get the code
 
-### 2. Create Environment
-
-To set up the environment, follow these steps:
+Open a terminal (PowerShell on Windows, Terminal on macOS) and run:
 
 ```bash
-# Create conda env with Python 3.10
-conda create -n datamite_env python=3.10
-
-# Activate it
-conda activate datamite_env
-
-# Install dependencies
-pip install -r requirements.txt
+git clone --recursive https://github.com/eduardovyhmeister/Datamite.git
+cd Datamite
+git submodule update --init --recursive --remote
 ```
+
+Open the submodule folder in your editor:
+Datamite/RAGDataMite
+
+If using PyCharm, open RAGDataMite directly as the project.
 
 ---
 
-### 3. Generate API keys
+### 2. Create a Python environment
 
-###  Claude (Anthropic)
+```bash
+conda create -n datamite_env python=3.10 -y
+conda activate datamite_env
+```
+---
+
+### 3. Install required packages
+
+From inside RAGDataMite:
+```bash
+pip install -r requirements.txt
+```
+---
+
+### 4. Set your LLM provider and API key
+
+Choose one provider.
+
+####  Option A — Claude (Anthropic)
 1. Sign in to the [Anthropic Console](https://console.anthropic.com/).
 2. Navigate to **Settings** → **API Keys**
 3. Click **Create Key**, give it a name (e.g., “datamite_test”), and copy the generated key. **Save it safely**.
 
-###  DeepSeek (via OpenRouter)
+Next, set this API key in your environment variables
+
+##### Mac/Linus OS
+```bash
+export LLM_PROVIDER=claude
+export ANTHROPIC_API_KEY=YOUR_ANTHROPIC_KEY
+```
+##### Windows
+
+```bash
+$env:LLM_PROVIDER = "claude"
+$env:ANTHROPIC_API_KEY = "YOUR_ANTHROPIC_KEY"
+```
+
+####  Option B — DeepSeek (via OpenRouter)
+
 1. Go to [OpenRouter’s website](https://openrouter.ai/) and **sign up or log in**.
 2. Open the menu (top-right), go to **Settings** → **API Keys**, and click **Create Key**.
 3. Name the key and then copy it and store it safely—this key grants API access to DeepSeek models via OpenRouter.
 
----
+Next, set this API key in your environment variables
 
-### 4. Environment variables
-
-You need to export API keys depending on which LLM provider you want to use.
-
-Claude (Anthropic):
-
+##### Mac/Linus OS
 ```bash
-# macOS
-export LLM_PROVIDER=claude
-export ANTHROPIC_API_KEY=KEY
-
-# Windows
-$env:LLM_PROVIDER = "claude"
-$env:ANTHROPIC_API_KEY = "KEY" 
-```
-
-DeepSeek (via OpenRouter):
-
-```bash
-# macOS
 export LLM_PROVIDER=deepseek
-export OPENROUTER_API_KEY=KEY
-
-# Windows
-$env:LLM_PROVIDER = "deepseek"
-$env:OPENROUTER_API_KEY = "KEY" 
+export OPENROUTER_API_KEY=YOUR_OPENROUTER_KEY
 ```
+
+##### Windows
+
+```bash
+$env:LLM_PROVIDER = "deepseek"
+$env:OPENROUTER_API_KEY = "YOUR_OPENROUTER_KEY"
+```
+
+Note: On Windows you must include quotes whenever setting an environment variable , e.g. "sk-or-..."
+
 ---
 
-### 5. Run with CLI
+### 5. Run a one-shot test
 
 Build the index, start the server, send a query, and stop the server, all in one step.
 
@@ -116,3 +134,57 @@ Subsequent tests (do NOT index again):
 ```bash
 python cli.py ask --question "What is CAPEX?" --port 8000 --no-index
 ```
+
+---
+
+## Switching providers later
+
+Just reset the environment variables for the provider you want (Claude or DeepSeek) and re-run the test:
+
+```bash
+python cli.py ask --question "What is CAPEX?" --port 8000 --no-index
+```
+
+---
+
+## Example response
+
+When successful, you should see something like this:
+
+```bash
+Starting Uvicorn on port 8000 ...
+POST http://127.0.0.1:8000/ask
+{
+  "answer": "Based on the provided context, CAPEX (also known as Capital Cost) refers to one-time, upfront investments made to acquire, upgrade, or maintain long-term physical and technological assets...",
+  "sources": [
+    {
+      "name": "CAPEX",
+      "score": null,
+      "url": null,
+      "snippet": "KPI Name: CAPEX\nAlternative Names: Capital Cost, Hardware Costs...",
+      "metadata": {
+        "source": "RAG/Content/ProcessedFiles/clean_KPIs.csv",
+        "type": "KPI",
+        "name": "CAPEX"
+      }
+    }
+  ],
+  "meta": {
+    "k": 3,
+    "min_similarity": 0.28
+  }
+}
+Stopping server (PID 10424)
+```
+
+	•	answer → model’s response based on your documents
+	•	sources → which document(s) were used
+	•	meta → retrieval settings used
+
+---
+
+## Notes for Windows vs macOS
+
+	•	Setting variables:
+	•	macOS/Linux → export NAME=value
+	•	Windows PowerShell → $env:NAME = "value"
