@@ -4,36 +4,15 @@ Prototype for a Retrieval-Augmented Generation (RAG) feature in DATAMITE using L
 
 What Does This Project Do?
 
-This project builds a basic pipeline that:
-- Preprocesses structured CSV files (content for KB)
-- Converts them into LangChain-compatible `Document` objects
-- Generates vector embeddings for LangChain docs
-- Stores those embeddings in a vector DB
-- Can retrieve documents based on users question
-- Can provide LLM (Claude or Deepseek) generated answers for users questions
+This project provides a minimal working pipeline for running a Retrieval-Augmented Generation (RAG) workflow on the Datamite knowledge base.
 
-In this prototype, we also expose the pipeline through a FastAPI service. This allows us to run the API locally, ask questions via the CLI or endpoint and receive answers directly from the chosen LLM along with the supporting source documents.  
+It:
 
-## How to Run
+Builds or loads a vector database (Chroma) from your processed CSV content.
 
-This project supports running the RAG Fast API with **two different LLM providers**:
-- [Anthropic Claude](https://www.anthropic.com/)  
-- [DeepSeek (via OpenRouter)](https://openrouter.ai/)  
+Retrieves the most relevant documents using fixed parameters (k and similarity_threshold).
 
-You can switch between them without changing code by setting one environment variable.
-
----
-
-## What you’ll do
-
-	1.	Get the code
-	2.	Create a Python environment
-	3.	Install the required packages
-	4.	Set your LLM provider and API key
-	5.	Run a one-shot test by sending API request
-	6.	Ask more questions (without rebuilding)
-
-
+Passes the retrieved context to a Large Language Model (LLM) such as Claude or DeepSeek.
 
 ### Prerequisites
 
@@ -74,117 +53,59 @@ pip install -r requirements.txt
 ```
 ---
 
-### 4. Set your LLM provider and API key
+### 4. Configuration (config.yaml)
 
-Choose one provider.
-
-####  Option A — Claude (Anthropic)
-1. Sign in to the [Anthropic Console](https://console.anthropic.com/).
-2. Navigate to **Settings** → **API Keys**
-3. Click **Create Key**, give it a name (e.g., “datamite_test”), and copy the generated key. **Save it safely**.
-
-Next, set this API key in your environment variables
-
-##### Mac/Linus OS
-```bash
-export LLM_PROVIDER=claude
-export ANTHROPIC_API_KEY=YOUR_ANTHROPIC_KEY
-```
-##### Windows
+You can control everything from this single file:
 
 ```bash
-$env:LLM_PROVIDER = "claude"
-$env:ANTHROPIC_API_KEY = "YOUR_ANTHROPIC_KEY"
+# --- RAG settings ---
+persist_dir: "RAG/ProcessedDocuments/chroma_db"
+
+retrieval:
+  k: 3
+  similarity_threshold: 0.30  # cosine similarity threshold
+
+# --- LLM settings ---
+llm:
+  provider: "deepseek"       # active provider: "claude" or "deepseek"
+
+  claude:
+    model: "claude-3-5-sonnet-20241022"
+    api_key: "sk-ant-XXX"
+
+  deepseek:
+    model: "deepseek/deepseek-chat-v3-0324:free"
+    api_key: "sk-or-XXX"
+    base_url: "https://openrouter.ai/api/v1"
 ```
 
-####  Option B — DeepSeek (via OpenRouter)
+### 5. How to Switch Providers
 
-1. Go to [OpenRouter’s website](https://openrouter.ai/) and **sign up or log in**.
-2. Open the menu (top-right), go to **Settings** → **API Keys**, and click **Create Key**.
-3. Name the key and then copy it and store it safely—this key grants API access to DeepSeek models via OpenRouter.
-
-Next, set this API key in your environment variables
-
-##### Mac/Linus OS
-```bash
-export LLM_PROVIDER=deepseek
-export OPENROUTER_API_KEY=YOUR_OPENROUTER_KEY
-```
-
-##### Windows
-
-```bash
-$env:LLM_PROVIDER = "deepseek"
-$env:OPENROUTER_API_KEY = "YOUR_OPENROUTER_KEY"
-```
-
-Note: On Windows you must include quotes whenever setting an environment variable , e.g. "sk-or-..."
-
----
-
-### 5. Run a one-shot test
-
-Build the index, start the server, send a query, and stop the server, all in one step.
+Just change one line:
 
 ```bash
-python cli.py ask --index --reset-index --question "What is CAPEX?" --port 8000
+provider: "claude" or provider: "deepseek"
 ```
-Subsequent tests (do NOT index again):
+
+### 6. How to Run?
+After setting up all the project in IDE, simply run the main.py or use terminal to ask a question:
 
 ```bash
-python cli.py ask --question "What is CAPEX?" --port 8000 --no-index
+python main.py --question "What is CAPEX?"
 ```
 
----
+### 6. How to Change the Question
 
-## Switching providers later
-
-Just reset the environment variables for the provider you want (Claude or DeepSeek) and re-run the test:
+In main.py, look for this section:
 
 ```bash
-python cli.py ask --question "What is CAPEX?" --port 8000 --no-index
+result1 = rag_with_validation(
+    "What is CAPEX?",
+    min_similarity=similarity_threshold,
+    k=k,
+    llm=llm_client
+)
 ```
 
----
+You can change "What is CAPEX?" to any other question you want to test.
 
-## Example response
-
-When successful, you should see something like this:
-
-```bash
-Starting Uvicorn on port 8000 ...
-POST http://127.0.0.1:8000/ask
-{
-  "answer": "Based on the provided context, CAPEX (also known as Capital Cost) refers to one-time, upfront investments made to acquire, upgrade, or maintain long-term physical and technological assets...",
-  "sources": [
-    {
-      "name": "CAPEX",
-      "score": null,
-      "url": null,
-      "snippet": "KPI Name: CAPEX\nAlternative Names: Capital Cost, Hardware Costs...",
-      "metadata": {
-        "source": "RAG/Content/ProcessedFiles/clean_KPIs.csv",
-        "type": "KPI",
-        "name": "CAPEX"
-      }
-    }
-  ],
-  "meta": {
-    "k": 3,
-    "min_similarity": 0.28
-  }
-}
-Stopping server (PID 10424)
-```
-
-	•	answer → model’s response based on your documents
-	•	sources → which document(s) were used
-	•	meta → retrieval settings used
-
----
-
-## Notes for Windows vs macOS
-
-	•	Setting variables:
-	•	macOS/Linux → export NAME=value
-	•	Windows PowerShell → $env:NAME = "value"

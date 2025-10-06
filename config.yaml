@@ -1,0 +1,19 @@
+# --- RAG settings ---
+persist_dir: "RAG/ProcessedDocuments/chroma_db"
+
+retrieval:
+  k: 3
+  similarity_threshold: 0.30  # cosine thresh for filtering
+
+# --- LLM settings ---
+llm:
+  provider: "deepseek"       # active provider: "claude" or "deepseek"
+
+  claude:
+    model: "claude-3-5-sonnet-20241022"
+    api_key: "sk-ant-"
+
+  deepseek:
+    model: "deepseek/deepseek-chat-v3-0324:free"
+    api_key: "sk-or-v1-"
+    base_url: "https://openrouter.ai/api/v1"
